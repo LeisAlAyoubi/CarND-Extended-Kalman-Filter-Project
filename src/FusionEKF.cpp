@@ -37,6 +37,12 @@ FusionEKF::FusionEKF() {
    * TODO: Set the process and measurement noises
    */
 
+  //measurement matrix - laser
+  H_laser_ << 1, 0, 0, 0,
+              0, 1, 0, 0;
+
+  //jacobian matrix - radar
+  Hj_ = tools.CalculateJacobian(ekf_.x_);
 
 }
 
