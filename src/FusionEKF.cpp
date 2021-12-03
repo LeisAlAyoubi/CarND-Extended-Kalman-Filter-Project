@@ -43,7 +43,7 @@ FusionEKF::FusionEKF() {
               0, 1, 0, 0;
 
   //jacobian matrix - radar
-  Hj_ = tools.CalculateJacobian(ekf_.x_);
+  Hj_ = MatrixXd::Zero(3,4);
 
 }
 
@@ -123,8 +123,11 @@ void FusionEKF::ProcessMeasurement(const MeasurementPackage &measurement_pack) {
   previous_timestamp_ = measurement_pack.timestamp_;
 
   // 1. Modify the F matrix so that the time is integrated
-  ekf_.F_(0,2) = dt;
-  ekf_.F_(1,3) = dt;
+  ekf_.F_ = MatrixXd(4,4);
+  ekf_.F_ <<  1, 0, dt, 0,
+              0, 1, 0, dt,
+              0, 0, 1, 0,
+              0, 0, 0, 1;
 
   // 2. Set the process covariance matrix Q
   float noise_ax = 9;
@@ -156,9 +159,11 @@ void FusionEKF::ProcessMeasurement(const MeasurementPackage &measurement_pack) {
 
   if (measurement_pack.sensor_type_ == MeasurementPackage::RADAR) {
     // TODO: Radar updates
+    ekf_.UpdateEKF(measurement_pack.raw_measurements_);
 
   } else {
     // TODO: Laser updates
+    ekf_.Update(measurement_pack.raw_measurements_);
 
   }
 
